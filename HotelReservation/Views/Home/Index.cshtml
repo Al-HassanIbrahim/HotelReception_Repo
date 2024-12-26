@@ -1,0 +1,223 @@
+﻿@model HotelReservation.Models.RoomViewModel
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Hotel Reservation System</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            margin: 0;
+            padding: 0;
+            background-color: #f4f4f9;
+        }
+
+        header {
+            background-color: #2c3e50;
+            color: #fff;
+            padding: 20px 10px;
+            text-align: center;
+        }
+
+            header h1 {
+                margin: 0;
+                font-size: 2.5em;
+            }
+
+        nav {
+            display: flex;
+            justify-content: center;
+            background-color: #34495e;
+            padding: 10px;
+        }
+
+            nav a {
+                color: #fff;
+                text-decoration: none;
+                margin: 0 15px;
+                font-size: 1.2em;
+            }
+
+                nav a:hover {
+                    text-decoration: underline;
+                }
+
+        .container {
+            padding: 20px;
+            max-width: 1200px;
+            margin: auto;
+        }
+
+        .section {
+            margin-bottom: 30px;
+            padding: 20px;
+            background: #fff;
+            border-radius: 10px;
+            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+        }
+
+            .section h2 {
+                margin-top: 0;
+                color: #34495e;
+            }
+
+        .grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+            gap: 20px;
+        }
+
+        .card {
+            background: #ecf0f1;
+            padding: 20px;
+            border-radius: 10px;
+            box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+            text-align: center;
+        }
+
+            .card h3 {
+                margin-bottom: 10px;
+            }
+
+            .card p {
+                color: #7f8c8d;
+            }
+
+        footer {
+            text-align: center;
+            padding: 10px;
+            background-color: #2c3e50;
+            color: #fff;
+        }
+
+        form {
+            display: flex;
+            flex-direction: column;
+            gap: 10px;
+        }
+    </style>
+</head>
+<body>
+    <header>
+        <h1>Hotel Reservation System</h1>
+    </header>
+
+    <nav>
+        <a href="#availability">Room Availability</a>
+        <a href="#checkin">Check-In</a>
+        <a href="#checkout">Check-Out</a>
+        <a href="#guests">Guest Information</a>
+        <a href="#billing">Billing</a>
+    </nav>
+
+    <div class="container">
+        <section id="roomavailability" class="section">
+            <h2>Available Rooms</h2>
+            
+            <div class="grid">
+                <div class="card">
+                    <h3>Single Rooms</h3>
+                    <p>@Model.X</p>
+                </div>
+                <div class="card">
+                    <h3>Double Rooms</h3>
+                    <p>@Model.Y</p>
+                </div>
+                <div class="card">
+                    <h3>Suites</h3>
+                    <p>@Model.Z</p>
+                </div>
+            </div>
+        </section>
+        <section>
+            <h2>Add Guest</h2>
+            <form asp-action="AddGuest" method="post">
+                <label for="name">Name:</label>
+                <input type="text" id="name" name="name" required><br>
+
+                <label for="phone">Phone:</label>
+                <input type="text" id="phone" name="phone" required><br>
+
+                <label for="gender">Gender:</label>
+                <select id="gender" name="gender">
+                    <option value="M">Male</option>
+                    <option value="F">Female</option>
+                </select><br>
+
+                <button type="submit">Add Guest</button>
+            </form>
+        </section>
+        
+        <section id="checkin" class="section">
+            <h2>Check-In</h2>
+            <form asp-action="CheckIn" method="post">
+                <label for="phone">Guest Phone:</label>
+                <input type="text" id="phone" name="phone" required />
+
+                <label for="roomId">Room ID:</label>
+                <input type="number" id="roomId" name="roomId" required />
+
+                <label for="services">Services:</label>
+                <select id="services" name="serviceIds" multiple>
+                    @foreach (var service in Model.Services)
+                    {
+                        <option value="@service.SId">@service.SName (@service.Price)</option>
+                    }
+                </select>
+
+                <label for="checkOutDate">Check-Out Date:</label>
+                <input type="date" id="checkOutDate" name="checkOutDate" required />
+
+                <button type="submit">Check-In</button>
+            </form>
+
+        </section>
+        <section id="guests" class="section">
+            <h2>Guest Search</h2>
+            <form asp-action="GuestSearch" method="get">
+                <label for="phone">Guest Phone:</label>
+                <input type="text" name="phone" id="phone" required />
+
+                <button type="submit">Search</button>
+            </form>
+       @*      <div id="guest-bookings">
+              
+            </div> *@
+
+
+        </section>
+
+      
+        <section id="checkout" class="section">
+            <h2>Check-Out</h2>
+            <form asp-action="CheckOut" method="post">
+                <label for="phone">Guest Phone:</label>
+                <input type="text" name="phone" id="phone" required />
+
+                <label for="amountPaid">Amount Paid:</label>
+                <input type="number" name="amountPaid" id="amountPaid" step="0.01" required />
+
+                <button type="submit">Check Out</button>
+            </form>
+        </section>
+    </div>
+    <section id="availability" class="section">
+        <h2>Room Availability</h2>
+        <div class="grid">
+            @foreach (var room in Model.Rooms)
+            {
+                <div class="card">
+                    <h3>@room.RType</h3>
+                    <p>Room ID: @room.RId</p>
+                    <p>Status: @(room.Availability == 1 ? "Available" : "Not Available")</p>
+                    <p>Price: $@room.Price</p>
+                </div>
+            }
+        </div>
+    </section>
+    <footer>
+        &copy; 2024 Hotel Reservation System. All rights reserved.
+    </footer>
+</body>
+</html>
